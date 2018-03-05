@@ -12,7 +12,7 @@ contract TimeLockedWalletFactory {
     view
     returns(address[])
   {
-    return wallets[user];
+    return wallets[_user];
   }
   
   function newTimeLockedWallet(address _owner, uint256 _unlockDate)
