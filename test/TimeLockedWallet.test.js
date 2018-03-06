@@ -74,7 +74,7 @@ contract('TimeLockedWallet', (accounts) => {
   
   it("should not allow anyone to withdraw token before unlock date", async () => {
   // Create wallet with past unlock date 
-  createAndLoadWallet(creator, owner, pastDate);
+  createAndLoadWallet(creator, owner, beforeDate);
   // Attempted token withdrawals
   try {
     await timeLockedWallet.withdrawTokens(tikiToken.address, {from: owner});
@@ -129,6 +129,17 @@ contract('TimeLockedWallet', (accounts) => {
   });
   
   it("should allow anyone to get info about wallet", async () => {
-    
+    // Create timestamp 
+    let timestamp = Math.floor((new Date).getTime() / 1000);
+    // Create wallet with future unlock date
+    createAndLoadWallet(creator, owner, futureDate);
+    // Get wallet info 
+    let info = await timeLockedWallet.info();
+    // Compare results 
+    assert(info[0] == creator);
+    assert(info[1] == owner);
+    assert(info[2].toNumber() == futureDate);
+    assert(info[3].toNumber() == timestamp);
+    assert(info[4].toNumber() == ethToSend);
   });  
 });
