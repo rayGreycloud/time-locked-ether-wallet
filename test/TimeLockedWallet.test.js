@@ -21,8 +21,9 @@ async function createAndLoadWallet(creator, owner, unlockDate) {
 contract('TimeLockedWallet', (accounts) => {
 
   it("should not allow anyone to withdraw funds before unlock date", async () => {
+    // Create wallet with future unlock date
     createAndLoadWallet(creator, owner, futureDate);
-    
+    // Attempted withdrawals
     try {
       await timeLockedWallet.withdraw({from: owner});
       assert(false, "Expected error not received");
@@ -37,7 +38,7 @@ contract('TimeLockedWallet', (accounts) => {
       await timeLockedWallet.withdraw({from: other});
       assert(false, "Expected error not received");
     } catch (error) {} // expected
-    
+    // Wallet balance should be unchanged
     assert(ethToSend == await web3.eth.getBalance(timeLockedWallet.address));
   });
   
@@ -55,7 +56,20 @@ contract('TimeLockedWallet', (accounts) => {
   });
   
   it("should not allow others to withdraw funds after unlock date", async () => {
-    
+    // Create wallet with past unlock date 
+    createAndLoadWallet(creator, owner, pastDate);
+    // Non-owners try to withdraw
+    try {
+      await timeLockedWallet.withdraw({from: creator});
+      assert(false, "Expected error not received");
+    } catch (error) {} // expected
+        
+    try {
+      await timeLockedWallet.withdraw({from: other});
+      assert(false, "Expected error not received");
+    } catch (error) {} // expected
+    // Wallet balance should be unchanged
+    assert(ethToSend == await web3.eth.getBalance(timeLockedWallet.address));    
   });
   
   it("should not allow anyone to withdraw token before unlock date", async () => {
