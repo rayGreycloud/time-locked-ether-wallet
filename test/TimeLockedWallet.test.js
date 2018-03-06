@@ -73,7 +73,27 @@ contract('TimeLockedWallet', (accounts) => {
   });
   
   it("should not allow anyone to withdraw token before unlock date", async () => {
-    
+  // Create wallet with past unlock date 
+  createAndLoadWallet(creator, owner, pastDate);
+  // Attempted token withdrawals
+  try {
+    await timeLockedWallet.withdrawTokens(tikiToken.address, {from: owner});
+    assert(false, "Expected error not received");
+  } catch (error) {} // expected
+  
+  try {
+    await timeLockedWallet.withdrawTokens(tikiToken.address, {from: creator});
+    assert(false, "Expected error not received");
+  } catch (error) {} // expected
+      
+  try {
+    await timeLockedWallet.withdrawTokens(tikiToken.address, {from: other});
+    assert(false, "Expected error not received");
+  } catch (error) {} // expected
+  
+  // Token balance should be unchanged
+  let balance = await tikiToken.balanceOf(timeLockedWallet.address);
+  assert(balance == amountOfTokens);    
   });
   
   it("should allow owner to withdraw token after unlock date", async () => {
