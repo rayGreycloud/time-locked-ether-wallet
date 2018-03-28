@@ -2,6 +2,9 @@ pragma solidity 0.4.19;
 
 import "./ERC20.sol";
 
+/**
+ * @title Tiki token
+ */
 contract TimeLockedWallet {
   // Define public variables (and getter methods)
   address public creator;
@@ -15,31 +18,50 @@ contract TimeLockedWallet {
     _;
   }
   
-  // Constructor (must be same as contract name or else)
+  /**
+   * @dev Constructor function 
+   * @param _creator address - address creating the wallet.
+   * @param _owner address - address that owns the wallet.
+   * @param _unlockDate uint256 - UNIX date after which wallet is unlocked.
+   */
   function TimeLockedWallet(
     address _creator,
     address _owner,
     uint256 _unlockDate
   ) public {
+    // Set creator, owner, unlockDate and createdAt
     creator = _creator;
     owner = _owner;
     unlockDate = _unlockDate;
+    // now is block timestamp - is not current
     createdAt = now;
   }
   
-  // Keep all ether sent to this address - fallback function  
+  /**
+   * @dev Fallback function to keep all ether sent to this address
+   */  
   function () payable public {
+    // Call event 
     Received(msg.sender, msg.value);
   }
   
-  // Callable by owner only after specified lock time to transfer ether
+  /**
+   * @dev Function to transfer ether after unlock date.  
+   * @dev Only callable by owner of wallet. 
+   */
   function withdraw() onlyOwner public {
     require(now >= unlockDate);
     // Send balance 
     msg.sender.transfer(this.balance);
+    // Call event
     Withdrew(msg.sender, this.balance);
   }
   
+  /**
+   * @dev Function to transfer tokens after unlock date. 
+   * @dev Only callable by owner of wallet. 
+   * @param _tokenContract address - address of ERC20 token contract 
+   */
   // Callable by owner only after specified lock time to transfer ERC20 tokens 
   function withdrawTokens(address _tokenContract) onlyOwner public {
     require(now >= unlockDate);
@@ -50,12 +72,21 @@ contract TimeLockedWallet {
     WithdrewTokens(_tokenContract, msg.sender, tokenBalance);
   }
   
-  // Returns wallet info 
+  /**
+   * @dev Function to return wallet information 
+   * @return creator address
+   * @return owner address 
+   * @return unlockDate uint256  
+   * @return createdAt uint256  
+   * @return this.balance - balance of wallet 
+   */
   function info() public view returns (address, address, uint256, uint256, uint256) {
     return (creator, owner, unlockDate, createdAt, this.balance);
   }
   
-  // Events to create log entries
+  /**
+   * @dev Events to create log entries
+   */
   event Received(address from, uint256 amount);
   event Withdrew(address to, uint256 amount);
   event WithdrewTokens(address tokenContract, address to, uint256 amount);  
