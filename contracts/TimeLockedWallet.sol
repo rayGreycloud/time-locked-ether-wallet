@@ -3,7 +3,7 @@ pragma solidity 0.4.19;
 import "./ERC20.sol";
 
 /**
- * @title Tiki token
+ * @title Time Locked Wallet
  */
 contract TimeLockedWallet {
   // Define public variables (and getter methods)
