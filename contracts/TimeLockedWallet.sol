@@ -62,7 +62,6 @@ contract TimeLockedWallet {
    * @dev Only callable by owner of wallet. 
    * @param _tokenContract address - address of ERC20 token contract 
    */
-  // Callable by owner only after specified lock time to transfer ERC20 tokens 
   function withdrawTokens(address _tokenContract) onlyOwner public {
     require(now >= unlockDate);
     ERC20 token = ERC20(_tokenContract);
