@@ -2,11 +2,18 @@ pragma solidity 0.4.19;
 
 import "./TimeLockedWallet.sol";
 
+/**
+ * @title TimeLockedWalletFactory
+ */
 contract TimeLockedWalletFactory {
   // Create mapping of owner address to array of owner's wallets
   mapping(address => address[]) wallets;
   
-  // Get user's wallets
+  /**
+   * @dev Function to get user's wallets 
+   * @param _user address 
+   * @return wallets [] - array of wallet addresses
+   */ 
   function getWallets(address _user)
     public
     view
@@ -14,7 +21,13 @@ contract TimeLockedWalletFactory {
   {
     return wallets[_user];
   }
-  
+
+  /**
+   * @dev Function to create new wallet 
+   * @param _owner address - Address of owner of new wallet  
+   * @param _unlockDate uint256 - UNIX date when new wallet is unlocked  
+   * @return wallet address - Address of new wallet
+   */   
   function newTimeLockedWallet(address _owner, uint256 _unlockDate)
     payable
     public 
@@ -26,7 +39,7 @@ contract TimeLockedWalletFactory {
     // Add wallet to sender's wallets 
     wallets[msg.sender].push(wallet);
     
-    // If sender != owner then add wallet to owner's 
+    // If sender is not owner then add to owner's wallets
     if (msg.sender != _owner) {
       wallets[_owner].push(wallet);
     }
@@ -38,12 +51,16 @@ contract TimeLockedWalletFactory {
     Created(wallet, msg.sender, _owner, now, _unlockDate, msg.value);
   }
   
-  // Prevents accidental ether transfer to factory 
+  /**
+   * @dev Fallback function to prevent accidental transfer to factory
+   */   
   function () public {
     revert();
   }
   
-  // Define Created event  
+  /**
+   * @dev Event to log created wallet 
+   */  
   event Created(
     address wallet, 
     address from,
